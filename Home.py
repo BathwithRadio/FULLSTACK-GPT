@@ -1,24 +1,25 @@
-import streamlit as st
-from langchain.prompts import PromptTemplate
+import streamlit as st # when data changed, whole python file will restart
 
-st.write("hello")
+st.set_page_config(
+    page_title="FullstackGPT Home",
+    page_icon="🤖",
+)
 
-st.write([1, 2, 3, 4])
+st.title("FullstackGPT Home")
 
-st.write({"x": 1})
-
-# st.write(PromptTemplate)
-
-
-p = PromptTemplate.from_template("xxxx")
-
-## magic - just leave it, program will print into screen
-p
-
-st.selectbox(
-    "Choose your model",
-    (
-        "GPT-3",
-        "GPT-4",
-    ),
+st.markdown(
+        """
+# Hello!
+            
+Welcome to my FullstackGPT Portfolio!
+            
+Here are the apps I made:
+            
+- [ ] [DocumentGPT](/DocumentGPT)
+- [ ] [PrivateGPT](/PrivateGPT)
+- [ ] [QuizGPT](/QuizGPT)
+- [ ] [SiteGPT](/SiteGPT)
+- [ ] [MeetingGPT](/MeetingGPT)
+- [ ] [InvestorGPT](/InvestorGPT)
+"""
 )
