@@ -8,6 +8,7 @@ from langchain.embeddings import OpenAIEmbeddings, CacheBackedEmbeddings
 from langchain.storage import LocalFileStore
 from langchain.prompts import ChatPromptTemplate, PromptTemplate
 from langchain.schema.runnable import RunnablePassthrough, RunnableLambda
+from langchain.callbacks.base import BaseCallbackHandler
 
 st.set_page_config(
     page_title="DocumentGPT Home",
@@ -17,8 +18,11 @@ st.set_page_config(
 if "messages" not in st.session_state:
     st.session_state["messages"] = []
 
+
+
 llm = ChatOpenAI(
     temperature=0.1,
+    streaming=True,
 )
 
 
