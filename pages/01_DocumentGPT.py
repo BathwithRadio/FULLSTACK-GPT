@@ -8,6 +8,7 @@ from langchain.embeddings import OpenAIEmbeddings, CacheBackedEmbeddings
 from langchain.storage import LocalFileStore
 from langchain.prompts import ChatPromptTemplate, PromptTemplate
 from langchain.schema.runnable import RunnablePassthrough, RunnableLambda
+from langchain.callbacks.base import BaseCallbackHandler
 
 st.set_page_config(
     page_title="DocumentGPT Home",
@@ -16,6 +17,13 @@ st.set_page_config(
 
 if "messages" not in st.session_state:
     st.session_state["messages"] = []
+
+
+
+llm = ChatOpenAI(
+    temperature=0.1,
+    streaming=True,
+)
 
 
 # with cache_data decoretor, streamlit will see which file is in the path
@@ -59,6 +67,24 @@ def paint_history():
         )
 
 
+def format_docs(docs):
+    return "\n\n".join(document.page_content for document in docs)
+
+
+prompt = ChatPromptTemplate.from_messages(
+    [
+        (
+            "system",
+            """
+            Answer the question using ONLY the following context. If you don''t know the answer just say you don't know. DON'T make anything up.
+            
+            Context: {context}
+            """,
+        ),
+        ("human", "{question}"),
+    ]
+)
+
 st.title("DocumentGPT")
 
 st.markdown(
@@ -83,6 +109,17 @@ if file:
     message = st.chat_input("Ask anything about your file...")
     if message:
         send_message(message, "human")
-        send_message("adsdad", "ai")
+        chain = (
+            {
+                "context": retriever | RunnableLambda(format_docs),
+                "question": RunnablePassthrough(),
+            }
+            | prompt
+            | llm
+        )
+        response = chain.invoke(message)
+        send_message(response.content, "ai")
+
+
 else:
     st.session_state["messages"] = []
