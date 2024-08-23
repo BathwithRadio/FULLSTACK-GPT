@@ -18,11 +18,28 @@ st.set_page_config(
 if "messages" not in st.session_state:
     st.session_state["messages"] = []
 
-
+class ChatCallbackHandler(BaseCallbackHandler):
+    
+    message = ""
+    
+    #kwarg = keyward arguments ( a=1, b=2 ,...)
+    def on_llm_start(self, *args,**kwargs):
+        self.message_box = st.empty()
+        
+    def on_llm_end(self, *args,**kwargs):
+        save_messages(self.message, "ai")
+            
+    def on_llm_new_token(self, token: str, *args, **kwargs):
+        print(token)
+        self.message += token
+        self.message_box.markdown(self.message)
 
 llm = ChatOpenAI(
     temperature=0.1,
     streaming=True,
+    callbacks=[
+        ChatCallbackHandler(),
+    ]
 )
 
 
@@ -50,12 +67,14 @@ def embed_file(file):
     retriever = vectorstore.as_retriever()
     return retriever
 
+def save_messages(message, role):
+    st.session_state["messages"].append({"message": message, "role": role})
 
 def send_message(message, role, save=True):
     with st.chat_message(role):
         st.markdown(message)
     if save:
-        st.session_state["messages"].append({"message": message, "role": role})
+        save_messages(message, role)
 
 
 def paint_history():
@@ -117,8 +136,9 @@ if file:
             | prompt
             | llm
         )
-        response = chain.invoke(message)
-        send_message(response.content, "ai")
+        with st.chat_message("ai"):
+            response = chain.invoke(message)
+        
 
 
 else:
