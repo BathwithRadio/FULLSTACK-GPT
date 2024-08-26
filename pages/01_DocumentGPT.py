@@ -144,7 +144,7 @@ if file:
     retriever = embed_file(file)
     send_message("I'm ready, Ask away!", "ai", save=False)
     paint_history()
-    save_messages(st.session_state["history", "memorized"])
+    # save_messages(st.session_state["history"], "memorized")
     message = st.chat_input("Ask anything about your file...")
     if message:
         send_message(message, "human")
@@ -160,8 +160,8 @@ if file:
         with st.chat_message("ai"):
             response = chain.invoke(message)
         
-        save_memory(message, response.content)
-        st.session_state["history"] += paint_history(message)
+        # save_memory(message, response.content)
+        # st.session_state["history"] += paint_memory(message)
         st.write("session state : ", st.session_state["history"])
 else:
     st.session_state["messages"] = []
